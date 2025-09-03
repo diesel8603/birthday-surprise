@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>6 Eylül — Senin İçin</title>
+  <style>
+    :root{
+      --bg:#fff0f6; --accent:#db2777; --card:#fff; --muted:#666;
+      --max-w:980px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; background:linear-gradient(180deg,#fff 0%,#fff8fb 100%); color:#222}
+    .container{max-width:var(--max-w);margin:0 auto;padding:20px}
+    header{display:flex;align-items:center;gap:12px}
+    header img{width:68px;height:68px;object-fit:cover;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,0.12)}
+    h1{margin:0;font-size:20px}
+    .center{display:flex;align-items:center;justify-content:center}
+
+    /* Pages */
+    .page{display:none;padding:18px 0}
+    .page.active{display:block}
+    .card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 8px 28px rgba(16,24,40,0.06)}
+
+    /* Countdown */
+    .timer{display:flex;gap:10px;justify-content:center;margin-top:12px}
+    .timebox{background:#fff;border-radius:10px;padding:10px 14px;min-width:64px;text-align:center}
+    .timebox .num{font-weight:700;font-size:20px}
+    .timebox .lab{font-size:12px;color:var(--muted)}
+
+    /* Gate form */
+    .pwrow{display:flex;gap:8px;justify-content:center;margin-top:16px}
+    input[type=password]{padding:10px 12px;border-radius:12px;border:1px solid #eee;min-width:160px}
+    button.primary{background:var(--accent);color:white;border:none;padding:10px 14px;border-radius:12px;cursor:pointer}
+
+    /* Notes grid */
+    .notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px}
+    .note img{width:100%;height:160px;object-fit:cover;border-radius:10px}
+    .note p{margin:8px 0 0}
+
+    /* Heart game area */
+    .game-area{position:relative;min-height:60vh;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#fff0f6 0,#ffeef8 100%);display:flex;flex-direction:column}
+    .game-top{display:flex;justify-content:space-between;align-items:center;padding:12px}
+    .score-badge{background:#fff;padding:8px 12px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+    .hearts-layer{position:absolute;inset:0;pointer-events:auto}
+    .heart{position:absolute;touch-action:none;user-select:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;}
+    .heart svg{width:100%;height:100%}
+    .fall{animation:floating linear forwards}
+    @keyframes floating{from{transform:translateY(120vh) scale(0.8);opacity:0}to{transform:translateY(-40vh) scale(1);opacity:1}}
+
+    /* Win overlay */
+    .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);color:white}
+    .overlay .box{background:transparent;text-align:center;padding:18px}
+    .overlay h2{font-size:34px;margin:0}
+    .overlay p{opacity:0.9}
+
+    /* Gallery */
+    .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    .gal img{width:100%;height:190px;object-fit:cover;border-radius:10px}
+    .letter{margin-top:14px;border-radius:12px;padding:16px;background:#fff;box-shadow:0 6px 18px rgba(16,24,40,0.06);white-space:pre-wrap}
+
+    footer.fixed{position:fixed;right:12px;bottom:12px;background:rgba(0,0,0,0.35);color:white;padding:8px 12px;border-radius:999px;font-size:12px}
+
+    /* Responsive */
+    @media (max-width:520px){header img{width:56px;height:56px} .timebox{min-width:48px}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <img id="heroImg" src="https://picsum.photos/seed/cover/800/800" alt="Kapak"/>
+      <div>
+        <h1>6 Eylül — Senin İçin 💖</h1>
+        <div style="color:var(--muted);font-size:13px">Küçük sürpriz web siten</div>
+      </div>
+    </header>
+
+    <!-- GATE -->
+    <section id="gate" class="page active">
+      <div class="card">
+        <div class="center"><strong>Doğum gününe geri sayım</strong></div>
+        <div class="timer" id="timer"></div>
+        <p class="center" style="color:var(--muted);margin-top:10px">Sürprize erişmek için küçük bir şifre gir.</p>
+        <div class="pwrow">
+          <input id="pw" type="password" placeholder="Şifre" autocomplete="one-time-code" />
+          <button id="pwBtn" class="primary">Giriş</button>
+        </div>
+        <div class="center" style="margin-top:10px;color:#c33" id="pwErr"></div>
+      </div>
+    </section>
+
+    <!-- NOTES -->
+    <section id="notes" class="page">
+      <div class="card">
+        <h2 style="margin:0">Küçük Aşk Notları</h2>
+        <p style="color:var(--muted);margin-top:6px">Senin için kalbimden minik notlar...</p>
+        <div class="notes" id="notesGrid"></div>
+        <div style="text-align:center;margin-top:14px">
+          <button id="toGame" class="primary">İlerleyelim güzelim →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- GAME -->
+    <section id="game" class="page">
+      <div class="game-area card" id="gameArea">
+        <div class="game-top">
+          <div style="padding-left:8px"><strong>Kalpleri Topla</strong><div style="font-size:12px;color:var(--muted)">Dokun/tıkla kalplere</div></div>
+          <div class="score-badge">Toplanan: <span id="score">0</span>/<span id="target">12</span></div>
+        </div>
+
+        <div class="hearts-layer" id="heartsLayer" aria-hidden="false"></div>
+
+        <div style="padding:12px;text-align:center;color:var(--muted)">Hedefe ulaşınca sihirli bir şey olacak…</div>
+
+        <div id="winOverlay" class="overlay" style="display:none">
+          <div class="box">
+            <h2>Seni Seviyorum 💘</h2>
+            <p>Kalbim hep seninle atan bir ritim…</p>
+            <div style="margin-top:12px">
+              <button id="toGallery" class="primary">İlerle →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALLERY + LETTER -->
+    <section id="gallery" class="page">
+      <div class="card">
+        <h2 style="margin:0">Galeri</h2>
+        <p style="color:var(--muted);margin-top:6px">Bizim hikayeden kareler</p>
+        <div class="gallery" id="galleryGrid" style="margin-top:12px"></div>
+
+        <div style="text-align:center;margin-top:16px">
+          <button id="toggleLetter" class="primary">Mektubu Aç</button>
+        </div>
+        <div id="letterBox" class="letter" style="display:none;margin-top:12px"></div>
+
+        <div style="margin-top:16px;text-align:center">
+          <button id="backTop" style="padding:8px 12px;border-radius:12px;border:1px solid #eee;background:white">Başa Dön</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="fixed footer" style="height:18px"></div>
+  </div>
+
+  <div class="fixed footer fixed" style="right:12px;bottom:12px">❤ Senin için</div>
+
+  <script>
+    /* ====== CONFIG - burayı kendine göre düzenle ====== */
+    const CONFIG = {
+      PASSWORD: 'askim0609',
+      heroImage: 'https://picsum.photos/seed/cover/800/800',
+      notes:[
+        {img:'https://picsum.photos/seed/note1/500/300', text:'Gülüşün, günümün en sevdiğim kısmı.'},
+        {img:'https://picsum.photos/seed/note2/500/300', text:'Kokun, en güzel evim.'},
+        {img:'https://picsum.photos/seed/note3/500/300', text:'Elini tuttuğumda dünya susuyor.'}
+      ],
+      gallery:[
+        {img:'https://picsum.photos/seed/love1/900/700', caption:'Birlikte olduğumuz her an bir şiir gibi.'},
+        {img:'https://picsum.photos/seed/love2/900/700', caption:'Gözlerinde kaybolmak en sevdiğim yolculuk.'},
+        {img:'https://picsum.photos/seed/love3/900/700', caption:'Kahkahalarımız dünyanın en güzel melodisi.'}
+      ],
+      letterText: `Sevgilim,\n\nDoğduğun gün, dünyaya en güzel renk eklendi. Benim dünyama ise sen girdin ve her şeyi daha anlamlı yaptın. Yanımda olduğun her an için minnettarım.\n\nNice yıllara beraber, el ele. Seni çok seviyorum.`,
+      targetHearts: 12
+    };
+
+    // apply hero image
+    document.getElementById('heroImg').src = CONFIG.heroImage;
+
+    /* ====== PAGE HELPERS ====== */
+    function show(pageId){
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    /* ====== COUNTDOWN ====== */
+    function nextSept6(){
+      const now = new Date();
+      let year = now.getFullYear();
+      if (now.getMonth()>8 || (now.getMonth()===8 && now.getDate()>6)) year++;
+      return new Date(year,8,6,0,0,0);
+    }
+    function startCountdown(){
+      const target = nextSept6().getTime();
+      const el = document.getElementById('timer');
+      function tick(){
+        const now = Date.now();
+        let diff = Math.max(0,target-now);
+        const days = Math.floor(diff/(1000*60*60*24));
+        const hours = Math.floor((diff/(1000*60*60))%24);
+        const mins = Math.floor((diff/(1000*60))%60);
+        const secs = Math.floor((diff/1000)%60);
+        el.innerHTML = ['Gün','Saat','Dakika','Saniye'].map((lab,i)=>{
+          const val = [days,hours,mins,secs][i];
+          return `<div class="timebox"><div class="num">${String(val).padStart(2,'0')}</div><div class="lab">${lab}</div></div>`;
+        }).join('');
+        requestAnimationFrame(() => { if(diff>0) setTimeout(tick, 500); });
+      }
+      tick();
+    }
+
+    /* ====== GATE ====== */
+    document.getElementById('pwBtn').addEventListener('click', ()=>{
+      const v = document.getElementById('pw').value.trim();
+      const err = document.getElementById('pwErr');
+      if(v === CONFIG.PASSWORD){ err.textContent=''; show('notes'); }
+      else{ err.textContent='Şifre yanlış, bir daha dener misin?'; setTimeout(()=>err.textContent='',1800); }
+    });
+
+    /* ====== NOTES ====== */
+    const notesGrid = document.getElementById('notesGrid');
+    CONFIG.notes.forEach(n=>{
+      const d = document.createElement('div'); d.className='note card';
+      d.innerHTML = `<img src="${n.img}" alt="note"/><p>${n.text}</p>`;
+      notesGrid.appendChild(d);
+    });
+    document.getElementById('toGame').addEventListener('click', ()=> show('game'));
+
+    /* ====== HEART GAME - fixed for mobile touch ====== */
+    (function(){
+      const layer = document.getElementById('heartsLayer');
+      const scoreEl = document.getElementById('score');
+      const targetEl = document.getElementById('target');
+      const winOverlay = document.getElementById('winOverlay');
+      let score = 0, target = CONFIG.targetHearts;
+      targetEl.textContent = target;
+      scoreEl.textContent = score;
+      let running = true;
+      let id = 0;
+
+      function spawn(){
+        if(!running) return;
+        const h = document.createElement('div');
+        h.className = 'heart fall';
+        const left = Math.random()*78 + 6; // 6% - 84%
+        const size = Math.floor(Math.random()*30 + 26); // 26 - 56
+        const dur = (Math.random()*4 + 6).toFixed(2); // 6-10s
+        h.style.left = left + '%';
+        h.style.width = size+'px';
+        h.style.height = size+'px';
+        h.style.bottom = '-80px';
+        h.style.zIndex = 20;
+        h.style.pointerEvents = 'auto';
+        h.dataset.id = id++;
+        // SVG heart
+        h.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.001 20.03l-1.45-1.32C5.4 14.21 2 11.36 2 8.06 2 5.44 4.24 3.5 6.7 3.5c1.7 0 3.24.88 4.3 2.19 1.06-1.31 2.6-2.19 4.3-2.19 2.46 0 4.7 1.94 4.7 4.56 0 3.3-3.4 6.15-8.55 10.65L12.001 20.03z" fill="#DB2777"/></svg>`;
+        // CSS animation duration
+        h.style.animationDuration = dur + 's';
+        // click / touch handler - use pointerdown for best compatibility
+        function hit(e){
+          e.preventDefault();
+          // prevent multiple hits
+          if(h.dataset.hit) return; h.dataset.hit = '1';
+          score++;
+          scoreEl.textContent = score;
+          // explode animation
+          h.style.transition = 'transform 260ms ease, opacity 260ms ease';
+          h.style.transform = 'scale(1.6)';
+          h.style.opacity = '0';
+          setTimeout(()=>{ if(h && h.parentNode) h.parentNode.removeChild(h); }, 300);
+          if(score >= target){
+            running = false; // stop spawning
+            // clear remaining hearts after short delay
+            setTimeout(()=>{ document.querySelectorAll('.heart').forEach(x=>x.remove()); }, 400);
+            // show win overlay after a short pause
+            setTimeout(()=>{ winOverlay.style.display='flex'; }, 500);
+          }
+        }
+        h.addEventListener('pointerdown', hit);
+        // remove when animation ends (went off-screen)
+        h.addEventListener('animationend', ()=>{ if(!h.dataset.hit && h.parentNode) h.parentNode.removeChild(h); });
+        layer.appendChild(h);
+      }
+
+      // spawn interval
+      const spawnInterval = setInterval(()=>{ if(running) spawn(); }, 650);
+      // allow restarting when showing game again
+      function reset(){ score=0; scoreEl.textContent=0; running=true; winOverlay.style.display='none'; }
+      // toGallery
+      document.getElementById('toGallery').addEventListener('click', ()=>{ show('gallery'); reset(); });
+      // when user goes back to game page, reset
+      const obs = new MutationObserver(()=>{ if(document.getElementById('game').classList.contains('active')) reset(); });
+      obs.observe(document.getElementById('game'),{attributes:true,attributeFilter:['class']});
+
+    })();
+
+    /* ====== GALLERY & LETTER ====== */
+    const galleryGrid = document.getElementById('galleryGrid');
+    CONFIG.gallery.forEach(g=>{
+      const d = document.createElement('div'); d.className='gal card';
+      d.innerHTML = `<img src="${g.img}" alt="photo"/><div style="padding:8px 10px;color:var(--muted)">${g.caption}</div>`;
+      galleryGrid.appendChild(d);
+    });
+    document.getElementById('toggleLetter').addEventListener('click', ()=>{
+      const box = document.getElementById('letterBox');
+      if(box.style.display==='none'){ box.style.display='block'; box.textContent = CONFIG.letterText; document.getElementById('toggleLetter').textContent='Mektubu Kapat' }
+      else{ box.style.display='none'; document.getElementById('toggleLetter').textContent='Mektubu Aç' }
+    });
+    document.getElementById('backTop').addEventListener('click', ()=> show('gate'));
+
+    /* ====== INIT ====== */
+    startCountdown();
+  </script>
+</body>
+</html>
