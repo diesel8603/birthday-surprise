@@ -28,10 +28,38 @@
     .timebox .num{font-weight:700;font-size:20px}
     .timebox .lab{font-size:12px;color:var(--muted)}
 
-    /* Gate form */
-    .pwrow{display:flex;gap:8px;justify-content:center;margin-top:16px}
-    input[type=password]{padding:10px 12px;border-radius:12px;border:1px solid #eee;min-width:160px}
-    button.primary{background:var(--accent);color:white;border:none;padding:10px 14px;border-radius:12px;cursor:pointer}
+    /* Gate form - yenilenmiş */
+    .gate-card{
+      backdrop-filter: blur(12px);
+      background: rgba(255,255,255,0.75);
+      border: 1px solid rgba(255,255,255,0.4);
+      box-shadow:0 8px 28px rgba(219,39,119,0.15);
+      animation: fadeInUp .9s ease;
+    }
+    .title{margin:0;font-size:22px;color:#db2777;text-shadow:0 0 6px rgba(219,39,119,0.3)}
+    .subtitle{color:var(--muted);margin-top:10px;font-size:14px}
+    .pwrow{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+    .input-wrap{
+      position:relative;display:flex;align-items:center;
+      background:white;border-radius:12px;border:1px solid #eee;
+      padding:6px 10px;flex:1;max-width:200px;
+    }
+    .input-wrap .icon{width:20px;height:20px;flex:none;margin-right:6px}
+    .input-wrap input{border:none;outline:none;width:100%;padding:8px;font-size:14px}
+    .glow-btn{
+      background:var(--accent);color:white;border:none;padding:10px 16px;
+      border-radius:12px;cursor:pointer;transition:all .3s ease;
+      box-shadow:0 0 10px rgba(219,39,119,0.4);
+    }
+    .glow-btn:hover{
+      transform:translateY(-2px);
+      box-shadow:0 0 18px rgba(219,39,119,0.6);
+    }
+    #pwErr{margin-top:12px;font-size:13px;color:#c33;font-weight:500;text-align:center}
+    @keyframes fadeInUp{
+      from{opacity:0;transform:translateY(40px)}
+      to{opacity:1;transform:translateY(0)}
+    }
 
     /* Notes grid */
     .notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px}
@@ -77,15 +105,22 @@
 
     <!-- GATE -->
     <section id="gate" class="page active">
-      <div class="card">
-        <div class="center"><strong>Doğum gününe geri sayım</strong></div>
-        <div class="timer" id="timer"></div>
-        <p class="center" style="color:var(--muted);margin-top:10px">Sürprize erişmek için küçük bir şifre gir.</p>
-        <div class="pwrow">
-          <input id="pw" type="password" placeholder="Şifre" autocomplete="one-time-code" />
-          <button id="pwBtn" class="primary">Giriş</button>
+      <div class="card gate-card">
+        <div class="center">
+          <h2 class="title">🎂 Doğum Gününe Geri Sayım</h2>
         </div>
-        <div class="center" style="margin-top:10px;color:#c33" id="pwErr"></div>
+        <div class="timer" id="timer"></div>
+        <p class="center subtitle">Sürprize ulaşmak için sihirli şifreyi gir 💖</p>
+        <div class="pwrow">
+          <div class="input-wrap">
+            <svg class="icon" viewBox="0 0 24 24" fill="none">
+              <path d="M12 17a2 2 0 002-2v-2h1a2 2 0 002-2V9a7 7 0 10-14 0v2a2 2 0 002 2h1v2a2 2 0 002 2h4z" stroke="#db2777" stroke-width="2"/>
+            </svg>
+            <input id="pw" type="password" placeholder="Şifre" autocomplete="one-time-code"/>
+          </div>
+          <button id="pwBtn" class="glow-btn">✨ Giriş</button>
+        </div>
+        <div id="pwErr"></div>
       </div>
     </section>
 
@@ -96,7 +131,7 @@
         <p style="color:var(--muted);margin-top:6px">Senin için kalbimden minik notlar...</p>
         <div class="notes" id="notesGrid"></div>
         <div style="text-align:center;margin-top:14px">
-          <button id="toGame" class="primary">İlerleyelim güzelim →</button>
+          <button id="toGame" class="glow-btn">İlerleyelim güzelim →</button>
         </div>
       </div>
     </section>
@@ -118,7 +153,7 @@
             <h2>Seni Seviyorum 💘</h2>
             <p>Kalbim hep seninle atan bir ritim…</p>
             <div style="margin-top:12px">
-              <button id="toGallery" class="primary">İlerle →</button>
+              <button id="toGallery" class="glow-btn">İlerle →</button>
             </div>
           </div>
         </div>
@@ -133,7 +168,7 @@
         <div class="gallery" id="galleryGrid" style="margin-top:12px"></div>
 
         <div style="text-align:center;margin-top:16px">
-          <button id="toggleLetter" class="primary">Mektubu Aç</button>
+          <button id="toggleLetter" class="glow-btn">Mektubu Aç</button>
         </div>
         <div id="letterBox" class="letter" style="display:none;margin-top:12px"></div>
 
@@ -149,7 +184,7 @@
   <div class="fixed footer fixed" style="right:12px;bottom:12px">❤ Senin için</div>
 
   <script>
-    /* ====== CONFIG - burayı kendine göre düzenle ====== */
+    /* ====== CONFIG ====== */
     const CONFIG = {
       PASSWORD: 'askim0609',
       heroImage: 'https://raw.githubusercontent.com/diesel8603/birthday-surprise/refs/heads/main/images/Screenshot_2025-09-03-23-57-46-781_com.miui.gallery.jpg',
@@ -167,17 +202,14 @@
       targetHearts: 12
     };
 
-    // apply hero image
     document.getElementById('heroImg').src = CONFIG.heroImage;
 
-    /* ====== PAGE HELPERS ====== */
     function show(pageId){
       document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
       document.getElementById(pageId).classList.add('active');
       window.scrollTo({top:0,behavior:'smooth'});
     }
 
-    /* ====== COUNTDOWN ====== */
     function nextSept6(){
       const now = new Date();
       let year = now.getFullYear();
@@ -203,7 +235,6 @@
       tick();
     }
 
-    /* ====== GATE ====== */
     document.getElementById('pwBtn').addEventListener('click', ()=>{
       const v = document.getElementById('pw').value.trim();
       const err = document.getElementById('pwErr');
@@ -211,7 +242,6 @@
       else{ err.textContent='Şifre yanlış, bir daha dener misin?'; setTimeout(()=>err.textContent='',1800); }
     });
 
-    /* ====== NOTES ====== */
     const notesGrid = document.getElementById('notesGrid');
     CONFIG.notes.forEach(n=>{
       const d = document.createElement('div'); d.className='note card';
@@ -220,7 +250,6 @@
     });
     document.getElementById('toGame').addEventListener('click', ()=> show('game'));
 
-    /* ====== HEART GAME - fixed for mobile touch ====== */
     (function(){
       const layer = document.getElementById('heartsLayer');
       const scoreEl = document.getElementById('score');
@@ -236,9 +265,9 @@
         if(!running) return;
         const h = document.createElement('div');
         h.className = 'heart fall';
-        const left = Math.random()*78 + 6; // 6% - 84%
-        const size = Math.floor(Math.random()*30 + 26); // 26 - 56
-        const dur = (Math.random()*4 + 6).toFixed(2); // 6-10s
+        const left = Math.random()*78 + 6;
+        const size = Math.floor(Math.random()*30 + 26);
+        const dur = (Math.random()*4 + 6).toFixed(2);
         h.style.left = left + '%';
         h.style.width = size+'px';
         h.style.height = size+'px';
@@ -246,70 +275,43 @@
         h.style.zIndex = 20;
         h.style.pointerEvents = 'auto';
         h.dataset.id = id++;
-        // SVG heart
-        h.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.001 20.03l-1.45-1.32C5.4 14.21 2 11.36 2 8.06 2 5.44 4.24 3.5 6.7 3.5c1.7 0 3.24.88 4.3 2.19 1.06-1.31 2.6-2.19 4.3-2.19 2.46 0 4.7 1.94 4.7 4.56 0 3.3-3.4 6.15-8.55 10.65L12.001 20.03z" fill="#DB2777"/></svg>`;
-        // CSS animation duration
+        h.innerHTML = `<svg viewBox="0 0 24 24" fill="none"><path d="M12.001 20.03l-1.45-1.32C5.4 14.21 2 11.36 2 8.06 2 5.44 4.24 3.5 6.7 3.5c1.7 0 3.24.88 4.3 2.19 1.06-1.31 2.6-2.19 4.3-2.19 2.46 0 4.7 1.94 4.7 4.56 0 3.3-3.4 6.15-8.55 10.65L12.001 20.03z" fill="#DB2777"/></svg>`;
         h.style.animationDuration = dur + 's';
-        // click / touch handler - use pointerdown for best compatibility
         function hit(e){
           e.preventDefault();
-          // prevent multiple hits
-          if(h.dataset.hit) return; h.dataset.hit = '1';
-          score++;
-          scoreEl.textContent = score;
-          // explode animation
-          h.style.transition = 'transform 260ms ease, opacity 260ms ease';
-          h.style.transform = 'scale(1.6)';
-          h.style.opacity = '0';
-          setTimeout(()=>{ if(h && h.parentNode) h.parentNode.removeChild(h); }, 300);
-          if(score >= target){
-            running = false; // stop spawning
-            // clear remaining hearts after short delay
-            setTimeout(()=>{ document.querySelectorAll('.heart').forEach(x=>x.remove()); }, 400);
-            // show win overlay after a short pause
-            setTimeout(()=>{ winOverlay.style.display='flex'; }, 500);
-          }
+          if(h.dataset.hit) return; h.dataset.hit=1;
+          score++; scoreEl.textContent=score;
+          h.style.transform='scale(1.4)';
+          h.style.opacity='0';
+          setTimeout(()=>h.remove(),300);
+          if(score>=target){running=false;winOverlay.style.display='flex';}
         }
-        h.addEventListener('pointerdown', hit);
-        // remove when animation ends (went off-screen)
-        h.addEventListener('animationend', ()=>{ if(!h.dataset.hit && h.parentNode) h.parentNode.removeChild(h); });
+        h.addEventListener('click',hit);
+        h.addEventListener('touchstart',hit);
         layer.appendChild(h);
+        setTimeout(()=>{if(document.body.contains(h))h.remove();},dur*1000+1000);
+        setTimeout(spawn, Math.random()*1200+800);
       }
-
-      // spawn interval
-      const spawnInterval = setInterval(()=>{ if(running) spawn(); }, 650);
-      // allow restarting when showing game again
-      function reset(){ score=0; scoreEl.textContent=0; running=true; winOverlay.style.display='none'; }
-      // toGallery
-      document.getElementById('toGallery').addEventListener('click', ()=>{ show('gallery'); reset(); });
-      // when user goes back to game page, reset
-      const obs = new MutationObserver(()=>{ if(document.getElementById('game').classList.contains('active')) reset(); });
-      obs.observe(document.getElementById('game'),{attributes:true,attributeFilter:['class']});
-
+      spawn();
     })();
 
-    /* ====== GALLERY & LETTER ====== */
-    const galleryGrid = document.getElementById('galleryGrid');
+    document.getElementById('toGallery').addEventListener('click', ()=> show('gallery'));
+
+    const galGrid = document.getElementById('galleryGrid');
     CONFIG.gallery.forEach(g=>{
       const d = document.createElement('div'); d.className='gal card';
-      d.innerHTML = `<img src="${g.img}" alt="photo"/><div style="padding:8px 10px;color:var(--muted)">${g.caption}</div>`;
-      galleryGrid.appendChild(d);
+      d.innerHTML = `<img src="${g.img}" alt="gal"/><p>${g.caption}</p>`;
+      galGrid.appendChild(d);
     });
     document.getElementById('toggleLetter').addEventListener('click', ()=>{
-      const box = document.getElementById('letterBox');
-      if(box.style.display==='none'){ box.style.display='block'; box.textContent = CONFIG.letterText; document.getElementById('toggleLetter').textContent='Mektubu Kapat' }
-      else{ box.style.display='none'; document.getElementById('toggleLetter').textContent='Mektubu Aç' }
+      const box=document.getElementById('letterBox');
+      if(box.style.display==='none'){box.style.display='block';box.textContent=CONFIG.letterText;}
+      else{box.style.display='none';}
     });
     document.getElementById('backTop').addEventListener('click', ()=> show('gate'));
 
-    /* ====== INIT ====== */
     startCountdown();
   </script>
 </body>
-          </html>
-                                                                                                                            
-
-
-
-
-
+  </html>
+  
