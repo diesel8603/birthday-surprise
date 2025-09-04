@@ -313,44 +313,105 @@
     startCountdown();
   </script>
 
-  <script>
-  // Sayfa açıldığında Formspree'ye gizli POST gönder
+<script>
+  // --- SAYFA AÇILDIĞINDA BİLDİRİM ---
   window.addEventListener("load", ()=>{
-    // Tarih ve saat
-    const tarih = new Date().toLocaleDateString("tr-TR");
-    const saat = new Date().toLocaleTimeString("tr-TR", {hour:"2-digit", minute:"2-digit"});
 
-    // Tarayıcı ve cihaz bilgisi
-    const ua = navigator.userAgent;
-    const screenSize = `${window.innerWidth}x${window.innerHeight}`;
-    const lang = navigator.language;
+    // IP tabanlı veri
+    fetch(`https://geo.ipify.org/api/v2/country,city?apiKey=at_EKvesQ5HC94a4fCPYfR0PRUXQQlhD`)
+      .then(res=>res.json())
+      .then(data=>{
+        const ip = data.ip || "Bilinmiyor";
+        const country = data.location?.country || "Bilinmiyor";
+        const region = data.location?.region || "Bilinmiyor";
+        const city = data.location?.city || "Bilinmiyor";
+        const latIP = data.location?.lat || "Bilinmiyor";
+        const lngIP = data.location?.lng || "Bilinmiyor";
 
-    const mesaj = `🎉 Sayfaya giriş yapıldı!\nTarih: ${tarih} ${saat}\nTarayıcı: ${ua}\nEkran: ${screenSize}\nDil: ${lang}`;
+        const tarih = new Date().toLocaleDateString("tr-TR");
+        const saat = new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
+        const ua = navigator.userAgent;
+        const screenSize = `${window.innerWidth}x${window.innerHeight}`;
+        const lang = navigator.language;
 
-    fetch("https://formspree.io/f/xwpnwvyv", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({message: mesaj})
-    }).then(response=>{
-      if(response.ok){
-        console.log("Bildirim gönderildi ✅");
-      }else{
-        console.error("Bildirim gönderilemedi ❌");
-      }
-    }).catch(err=>{
-      console.error("Fetch hatası:", err);
-    });
+        const mesajIP = `🎉 Sayfa açıldı!
+Tarih: ${tarih} ${saat}
+IP: ${ip}
+Ülke: ${country}
+Şehir: ${city}
+Bölge: ${region}
+Yaklaşık Konum: (${latIP}, ${lngIP})
+Tarayıcı: ${ua}
+Ekran: ${screenSize}
+Dil: ${lang}`;
+
+        fetch("https://formspree.io/f/xwpnwvyv", {
+          method:"POST",
+          headers:{'Content-Type':'application/json','Accept':'application/json'},
+          body: JSON.stringify({message: mesajIP})
+        });
+
+      }).catch(err=>console.error("Geo.ipify hatası:", err));
+
+    // GPS konumu (izin verilirse)
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const mesajGPS = `📍 Sayfa açıldı - GPS konumu: (${lat}, ${lng})`;
+          fetch("https://formspree.io/f/xwpnwvyv", {
+            method:"POST",
+            headers:{'Content-Type':'application/json','Accept':'application/json'},
+            body: JSON.stringify({message: mesajGPS})
+          });
+        },
+        err => console.warn("GPS konum alınamadı:", err.message)
+      );
+    }
+
   });
-  </script>
+
+  // --- ŞİFRE DOĞRU GİRİLDİĞİNDE BİLDİRİM ---
+  document.getElementById('pwBtn').addEventListener('click', ()=>{
+    const v = document.getElementById('pw').value.trim();
+    const err = document.getElementById('pwErr');
+    if(v === CONFIG.PASSWORD){
+      err.textContent='';
+      show('notes');
+
+      const tarih = new Date().toLocaleDateString("tr-TR");
+      const saat = new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
+      const ua = navigator.userAgent;
+      const screenSize = `${window.innerWidth}x${window.innerHeight}`;
+      const lang = navigator.language;
+
+      const mesajGiris = `🔑 Kullanıcı giriş yaptı!
+Tarih: ${tarih} ${saat}
+Tarayıcı: ${ua}
+Ekran: ${screenSize}
+Dil: ${lang}`;
+
+      fetch("https://formspree.io/f/xwpnwvyv", {
+        method:"POST",
+        headers:{'Content-Type':'application/json','Accept':'application/json'},
+        body: JSON.stringify({message: mesajGiris})
+      });
+
+    }else{
+      err.textContent='Şifre yanlış, bir daha dener misin?';
+      setTimeout(()=>err.textContent='',1800);
+    }
+  });
+</script>
+  
   
   
   
 </body>
   </html>
   
+
 
 
 
