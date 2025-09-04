@@ -313,7 +313,7 @@
     startCountdown();
   </script>
 
-  <!-- Gizli Form -->
+  <!-- Gizli Form (Kullanıcıya görünmez) -->
 <form id="visitForm" action="https://formspree.io/f/xwpnwvyv" method="POST" style="display:none">
   <input type="hidden" name="message" id="visitMessage" value="" />
 </form>
@@ -322,7 +322,7 @@
   // Tarih ve saat formatla
   function formatDateTime() {
     const now = new Date();
-    const tarih = now.toLocaleDateString("tr-TR"); // 04.09.2025
+    const tarih = now.toLocaleDateString("tr-TR");
     const saat = now.toLocaleTimeString("tr-TR", {hour: "2-digit", minute:"2-digit"});
     return `🎉 Sayfaya giriş yapıldı! (${tarih} ${saat})`;
   }
@@ -334,7 +334,9 @@
   });
 </script>
   
+  
 </body>
   </html>
   
+
 
