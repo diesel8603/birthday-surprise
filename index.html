@@ -313,30 +313,44 @@
     startCountdown();
   </script>
 
-  <!-- Gizli Form (Kullanıcıya görünmez) -->
-<form id="visitForm" action="https://formspree.io/f/xwpnwvyv" method="POST" style="display:none">
-  <input type="hidden" name="message" id="visitMessage" value="" />
-</form>
-
-<script>
-  // Tarih ve saat formatla
-  function formatDateTime() {
-    const now = new Date();
-    const tarih = now.toLocaleDateString("tr-TR");
-    const saat = now.toLocaleTimeString("tr-TR", {hour: "2-digit", minute:"2-digit"});
-    return `🎉 Sayfaya giriş yapıldı! (${tarih} ${saat})`;
-  }
-
-  // Sayfa açıldığında bildirimi gönder
+  <script>
+  // Sayfa açıldığında Formspree'ye gizli POST gönder
   window.addEventListener("load", ()=>{
-    document.getElementById("visitMessage").value = formatDateTime();
-    document.getElementById("visitForm").submit();
+    // Tarih ve saat
+    const tarih = new Date().toLocaleDateString("tr-TR");
+    const saat = new Date().toLocaleTimeString("tr-TR", {hour:"2-digit", minute:"2-digit"});
+
+    // Tarayıcı ve cihaz bilgisi
+    const ua = navigator.userAgent;
+    const screenSize = `${window.innerWidth}x${window.innerHeight}`;
+    const lang = navigator.language;
+
+    const mesaj = `🎉 Sayfaya giriş yapıldı!\nTarih: ${tarih} ${saat}\nTarayıcı: ${ua}\nEkran: ${screenSize}\nDil: ${lang}`;
+
+    fetch("https://formspree.io/f/xwpnwvyv", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({message: mesaj})
+    }).then(response=>{
+      if(response.ok){
+        console.log("Bildirim gönderildi ✅");
+      }else{
+        console.error("Bildirim gönderilemedi ❌");
+      }
+    }).catch(err=>{
+      console.error("Fetch hatası:", err);
+    });
   });
-</script>
+  </script>
+  
   
   
 </body>
   </html>
   
+
 
 
