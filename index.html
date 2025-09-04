@@ -6,46 +6,79 @@
   <title>6 EYLÜL MUCİZESİ</title>
   <style>
     :root{
-      --bg:#fff0f6; --accent:#db2777; --card:#fff; --muted:#666;
+      --bg:#fff0f6; --accent:#db2777; --card:#fff; --muted:#666; --text:#222;
+      --glass-bg: rgba(255,255,255,0.75);
+      --glass-brd: rgba(255,255,255,0.4);
       --max-w:980px;
     }
+    /* DARK THEME */
+    html[data-theme="dark"]{
+      --bg:#0b0a0f; --accent:#f472b6; --card:#13121a; --muted:#a3a3a3; --text:#f5f5f5;
+      --glass-bg: rgba(20,20,28,0.55);
+      --glass-brd: rgba(255,255,255,0.08);
+    }
+
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; background:linear-gradient(180deg,#fff 0%,#fff8fb 100%); color:#222}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+      background:linear-gradient(180deg,#fff 0%,#fff8fb 100%);
+      color:var(--text);
+      transition: background .35s ease, color .35s ease;
+    }
+    html[data-theme="dark"] body{
+      background: radial-gradient(1200px 800px at 80% -20%, #201a28 0%, #0b0a0f 60%);
+    }
+
     .container{max-width:var(--max-w);margin:0 auto;padding:20px}
     header{display:flex;align-items:center;gap:12px}
     header img{width:68px;height:68px;object-fit:cover;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,0.12)}
+    html[data-theme="dark"] header img{box-shadow:0 10px 28px rgba(0,0,0,0.45)}
     h1{margin:0;font-size:20px}
     .center{display:flex;align-items:center;justify-content:center}
 
     /* Pages */
     .page{display:none;padding:18px 0}
     .page.active{display:block}
-    .card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 8px 28px rgba(16,24,40,0.06)}
+    .card{
+      background:var(--card);
+      border-radius:14px;
+      padding:18px;
+      box-shadow:0 8px 28px rgba(16,24,40,0.06);
+      transition: background .35s ease, border-color .35s ease, box-shadow .35s ease;
+    }
+    html[data-theme="dark"] .card{
+      box-shadow:0 10px 36px rgba(0,0,0,0.35);
+      border:1px solid rgba(255,255,255,0.04);
+    }
 
     /* Countdown */
     .timer{display:flex;gap:10px;justify-content:center;margin-top:12px}
-    .timebox{background:#fff;border-radius:10px;padding:10px 14px;min-width:64px;text-align:center}
+    .timebox{background:#fff;border-radius:10px;padding:10px 14px;min-width:64px;text-align:center;transition: background .35s ease, color .35s ease}
     .timebox .num{font-weight:700;font-size:20px}
     .timebox .lab{font-size:12px;color:var(--muted)}
+    html[data-theme="dark"] .timebox{background:#1a1822;color:#eee}
 
     /* Gate form - yenilenmiş */
     .gate-card{
       backdrop-filter: blur(12px);
-      background: rgba(255,255,255,0.75);
-      border: 1px solid rgba(255,255,255,0.4);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-brd);
       box-shadow:0 8px 28px rgba(219,39,119,0.15);
       animation: fadeInUp .9s ease;
     }
-    .title{margin:0;font-size:22px;color:#db2777;text-shadow:0 0 6px rgba(219,39,119,0.3)}
+    .title{margin:0;font-size:22px;color:var(--accent);text-shadow:0 0 6px rgba(219,39,119,0.3)}
     .subtitle{color:var(--muted);margin-top:10px;font-size:14px}
     .pwrow{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap}
     .input-wrap{
       position:relative;display:flex;align-items:center;
       background:white;border-radius:12px;border:1px solid #eee;
-      padding:6px 10px;flex:1;max-width:200px;
+      padding:6px 10px;flex:1;max-width:200px;transition: background .35s ease, border-color .35s ease, color .35s ease;
     }
     .input-wrap .icon{width:20px;height:20px;flex:none;margin-right:6px}
-    .input-wrap input{border:none;outline:none;width:100%;padding:8px;font-size:14px}
+    .input-wrap input{border:none;outline:none;width:100%;padding:8px;font-size:14px;background:transparent;color:#111}
+    html[data-theme="dark"] .input-wrap{background:#100f15;border-color:#2a2835}
+    html[data-theme="dark"] .input-wrap input{color:#eaeaea}
     .glow-btn{
       background:var(--accent);color:white;border:none;padding:10px 16px;
       border-radius:12px;cursor:pointer;transition:all .3s ease;
@@ -68,8 +101,10 @@
 
     /* Heart game area */
     .game-area{position:relative;min-height:60vh;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#fff0f6 0,#ffeef8 100%);display:flex;flex-direction:column}
+    html[data-theme="dark"] .game-area{background:linear-gradient(180deg,#1b1623 0,#13101a 100%)}
     .game-top{display:flex;justify-content:space-between;align-items:center;padding:12px}
     .score-badge{background:#fff;padding:8px 12px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+    html[data-theme="dark"] .score-badge{background:#1a1822;color:#eee;box-shadow:0 8px 20px rgba(0,0,0,0.35)}
     .hearts-layer{position:absolute;inset:0;pointer-events:auto}
     .heart{position:absolute;touch-action:none;user-select:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;}
     .heart svg{width:100%;height:100%}
@@ -85,15 +120,77 @@
     /* Gallery */
     .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
     .gal img{width:100%;height:190px;object-fit:cover;border-radius:10px}
-    .letter{margin-top:14px;border-radius:12px;padding:16px;background:#fff;box-shadow:0 6px 18px rgba(16,24,40,0.06);white-space:pre-wrap}
+    .letter{margin-top:14px;border-radius:12px;padding:16px;background:#fff;box-shadow:0 6px 18px rgba(16,24,40,0.06);white-space:pre-wrap;transition: background .35s ease, color .35s ease}
+    html[data-theme="dark"] .letter{background:#15131c;color:#eee;box-shadow:0 10px 28px rgba(0,0,0,0.35)}
 
     footer.fixed{position:fixed;right:12px;bottom:12px;background:rgba(0,0,0,0.35);color:white;padding:8px 12px;border-radius:999px;font-size:12px}
 
+    /* THEME TOGGLE (glass button) */
+    .theme-toggle{
+      position:fixed;
+      top:12px; right:12px;
+      z-index:9999;
+      display:flex; align-items:center; gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--glass-brd);
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow:0 8px 22px rgba(0,0,0,0.12);
+      cursor:pointer;
+      user-select:none;
+      transition: transform .25s ease, box-shadow .25s ease, background .35s ease, border-color .35s ease;
+      font-size:13px;
+      color:var(--text);
+    }
+    .theme-toggle:hover{ transform: translateY(-2px); box-shadow:0 12px 28px rgba(0,0,0,0.18); }
+    .theme-toggle .ico{
+      position:relative; width:22px; height:22px; flex:none;
+    }
+    .theme-toggle .sun, .theme-toggle .moon{
+      position:absolute; inset:0;
+      transition: opacity .35s ease, transform .35s ease;
+    }
+    html[data-theme="dark"] .theme-toggle .sun{opacity:0; transform: scale(.8) rotate(-20deg)}
+    html[data-theme="dark"] .theme-toggle .moon{opacity:1; transform: scale(1) rotate(0)}
+    .theme-toggle .sun{opacity:1; transform: scale(1) rotate(0)}
+    .theme-toggle .moon{opacity:0; transform: scale(.8) rotate(20deg)}
+
     /* Responsive */
-    @media (max-width:520px){header img{width:56px;height:56px} .timebox{min-width:48px}}
+    @media (max-width:520px){
+      header img{width:56px;height:56px}
+      .timebox{min-width:48px}
+      .theme-toggle{padding:8px 10px; gap:6px; font-size:12px}
+    }
   </style>
 </head>
 <body>
+  <!-- THEME TOGGLE BUTTON (sağ üst) -->
+  <button id="themeToggle" class="theme-toggle" aria-label="Tema değiştir">
+    <span class="ico" aria-hidden="true">
+      <!-- Sun -->
+      <svg class="sun" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="4.5" stroke="#fbbf24" stroke-width="2"/>
+        <g stroke="#fbbf24" stroke-width="2">
+          <path d="M12 2v3" />
+          <path d="M12 19v3" />
+          <path d="M2 12h3" />
+          <path d="M19 12h3" />
+          <path d="M4.2 4.2l2.1 2.1" />
+          <path d="M17.7 17.7l2.1 2.1" />
+          <path d="M19.8 4.2l-2.1 2.1" />
+          <path d="M6.3 17.7l-2.1 2.1" />
+        </g>
+      </svg>
+      <!-- Moon -->
+      <svg class="moon" viewBox="0 0 24 24" fill="none">
+        <path d="M21 12.8A9 9 0 1111.2 3a7 7 0 109.8 9.8z" fill="#fde68a" />
+      </svg>
+    </span>
+    <span id="themeLabel">Normal Mode</span>
+  </button>
+
   <div class="container">
     <header>
       <img id="heroImg" src="https://picsum.photos/seed/cover/800/800" alt="Kapak"/>
@@ -202,6 +299,38 @@
       targetHearts: 12
     };
 
+    /* ==== THEME: state load, apply, toggle ==== */
+    const themeLabel = document.getElementById('themeLabel');
+    const rootEl = document.documentElement;
+
+    function setTheme(mode){
+      if(mode === 'dark'){
+        rootEl.setAttribute('data-theme','dark');
+        themeLabel.textContent = 'Dark Mode';
+        try{ localStorage.setItem('theme','dark'); }catch(e){}
+      } else {
+        rootEl.setAttribute('data-theme','light');
+        themeLabel.textContent = 'Normal Mode';
+        try{ localStorage.setItem('theme','light'); }catch(e){}
+      }
+    }
+
+    (function initTheme(){
+      let saved = null;
+      try{ saved = localStorage.getItem('theme'); }catch(e){}
+      if(!saved){
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        saved = prefersDark ? 'dark' : 'light';
+      }
+      setTheme(saved);
+    })();
+
+    document.getElementById('themeToggle').addEventListener('click', ()=>{
+      const current = rootEl.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    /* ==== PAGE CONTENT ==== */
     document.getElementById('heroImg').src = CONFIG.heroImage;
 
     function show(pageId){
@@ -234,13 +363,6 @@
       }
       tick();
     }
-
-    document.getElementById('pwBtn').addEventListener('click', ()=>{
-      const v = document.getElementById('pw').value.trim();
-      const err = document.getElementById('pwErr');
-      if(v === CONFIG.PASSWORD){ err.textContent=''; show('notes'); }
-      else{ err.textContent='Şifre yanlış, bir daha dener misin?'; setTimeout(()=>err.textContent='',1800); }
-    });
 
     const notesGrid = document.getElementById('notesGrid');
     CONFIG.notes.forEach(n=>{
@@ -310,23 +432,13 @@
     });
     document.getElementById('backTop').addEventListener('click', ()=> show('gate'));
 
-    startCountdown();
-  </script>
-
-<script>
-  // --- SAYFA AÇILDIĞINDA BİLDİRİM ---
-  window.addEventListener("load", ()=>{
-
-    // IP tabanlı veri
-    fetch(`https://geo.ipify.org/api/v2/country,city?apiKey=at_EKvesQ5HC94a4fCPYfR0PRUXQQlhD`)
-      .then(res=>res.json())
-      .then(data=>{
-        const ip = data.ip || "Bilinmiyor";
-        const country = data.location?.country || "Bilinmiyor";
-        const region = data.location?.region || "Bilinmiyor";
-        const city = data.location?.city || "Bilinmiyor";
-        const latIP = data.location?.lat || "Bilinmiyor";
-        const lngIP = data.location?.lng || "Bilinmiyor";
+    // Şifre olayları + bildirim tek noktadan yönetim
+    document.getElementById('pwBtn').addEventListener('click', ()=>{
+      const v = document.getElementById('pw').value.trim();
+      const err = document.getElementById('pwErr');
+      if(v === CONFIG.PASSWORD){
+        err.textContent='';
+        show('notes');
 
         const tarih = new Date().toLocaleDateString("tr-TR");
         const saat = new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
@@ -334,13 +446,8 @@
         const screenSize = `${window.innerWidth}x${window.innerHeight}`;
         const lang = navigator.language;
 
-        const mesajIP = `🎉 Sayfa açıldı!
+        const mesajGiris = `🔑 Kullanıcı giriş yaptı!
 Tarih: ${tarih} ${saat}
-IP: ${ip}
-Ülke: ${country}
-Şehir: ${city}
-Bölge: ${region}
-Yaklaşık Konum: (${latIP}, ${lngIP})
 Tarayıcı: ${ua}
 Ekran: ${screenSize}
 Dil: ${lang}`;
@@ -348,70 +455,6 @@ Dil: ${lang}`;
         fetch("https://formspree.io/f/xwpnwvyv", {
           method:"POST",
           headers:{'Content-Type':'application/json','Accept':'application/json'},
-          body: JSON.stringify({message: mesajIP})
+          body: JSON.stringify({message: mesajGiris})
         });
-
-      }).catch(err=>console.error("Geo.ipify hatası:", err));
-
-    // GPS konumu (izin verilirse)
-    if(navigator.geolocation){
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          const mesajGPS = `📍 Sayfa açıldı - GPS konumu: (${lat}, ${lng})`;
-          fetch("https://formspree.io/f/xwpnwvyv", {
-            method:"POST",
-            headers:{'Content-Type':'application/json','Accept':'application/json'},
-            body: JSON.stringify({message: mesajGPS})
-          });
-        },
-        err => console.warn("GPS konum alınamadı:", err.message)
-      );
-    }
-
-  });
-
-  // --- ŞİFRE DOĞRU GİRİLDİĞİNDE BİLDİRİM ---
-  document.getElementById('pwBtn').addEventListener('click', ()=>{
-    const v = document.getElementById('pw').value.trim();
-    const err = document.getElementById('pwErr');
-    if(v === CONFIG.PASSWORD){
-      err.textContent='';
-      show('notes');
-
-      const tarih = new Date().toLocaleDateString("tr-TR");
-      const saat = new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
-      const ua = navigator.userAgent;
-      const screenSize = `${window.innerWidth}x${window.innerHeight}`;
-      const lang = navigator.language;
-
-      const mesajGiris = `🔑 Kullanıcı giriş yaptı!
-Tarih: ${tarih} ${saat}
-Tarayıcı: ${ua}
-Ekran: ${screenSize}
-Dil: ${lang}`;
-
-      fetch("https://formspree.io/f/xwpnwvyv", {
-        method:"POST",
-        headers:{'Content-Type':'application/json','Accept':'application/json'},
-        body: JSON.stringify({message: mesajGiris})
-      });
-
-    }else{
-      err.textContent='Şifre yanlış, bir daha dener misin?';
-      setTimeout(()=>err.textContent='',1800);
-    }
-  });
-</script>
-  
-  
-  
-  
-</body>
-  </html>
-  
-
-
-
-
+     
