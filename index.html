@@ -457,10 +457,66 @@ window.addEventListener("load", () => {
     }).catch(err => console.error("SW kayıt hatası:", err));
   }
   </script>
+
+  <!-- Ana Ekrana Ekle Butonu -->
+<button id="installBtn" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: #0d6efd;
+  color: white;
+  font-size: 24px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  z-index: 9999;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  #installBtn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+">
+📲
+</button>
+
+  <script>
+let deferredPrompt;
+const installBtn = document.getElementById("installBtn");
+
+// Tarayıcı yükleme teklifine hazır olduğunda
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.style.display = "flex"; // görünür hale getir
+});
+
+// Kullanıcı butona tıklarsa
+installBtn.addEventListener("click", async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt(); // yükleme penceresini aç
+  const choice = await deferredPrompt.userChoice;
+  if (choice.outcome === "accepted") {
+    console.log("✅ Kullanıcı yüklemeyi kabul etti!");
+  } else {
+    console.log("❌ Kullanıcı yüklemeyi reddetti.");
+  }
+  installBtn.style.display = "none";
+  deferredPrompt = null;
+});
+</script>
+
   
 </body>
 </html>
         
+
 
 
 
