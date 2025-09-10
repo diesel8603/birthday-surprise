@@ -449,7 +449,17 @@ window.addEventListener("load", () => {
   });
 });
 </script>
+
+  <script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").then(() => {
+      console.log("Service Worker yüklendi!");
+    });
+  }
+  </script>
+  
 </body>
 </html>
         
+
 
