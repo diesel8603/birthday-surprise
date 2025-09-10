@@ -1,7 +1,7 @@
 {
   "name": "6 EYLÜL MUCİZESİ",
   "short_name": "Mucize",
-  "start_url": "./index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#fff0f6",
   "theme_color": "#0d6efd",
@@ -19,4 +19,5 @@
     }
   ]
 }
+
 
