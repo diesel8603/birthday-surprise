@@ -144,33 +144,26 @@
   </style>
 </head>
 <body>
-<!-- Ana Ekrana Ekle Butonu -->
-<button id="installBtn" style="
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: none;
-  background: #0d6efd;
-  color: white;
-  font-size: 24px;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
-  z-index: 9999;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  #installBtn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-}
 
+  <button id="installBtn" style="
+  display:none;
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  padding:10px 16px;
+  border:none;
+  border-radius:12px;
+  background:#db2777;
+  color:white;
+  font-size:14px;
+  cursor:pointer;
+  box-shadow:0 6px 16px rgba(0,0,0,0.25);
+  z-index:9999;
 ">
-📲
+📲 Ana Ekrana Ekle
 </button>
+
+
 
   
   <!-- (HTML içerikleri: header, gate, notes, game, gallery bölümleri buradaydı; bunları değiştirmedim) -->
@@ -488,37 +481,45 @@ window.addEventListener("load", () => {
   </script>
 
   
-
-  <script>
-let deferredPrompt;
+<script>
+let deferredPrompt = null;
 const installBtn = document.getElementById("installBtn");
 
-// Tarayıcı yükleme teklifine hazır olduğunda
+// beforeinstallprompt gelince butonu göster
 window.addEventListener("beforeinstallprompt", (e) => {
+  console.log("📲 beforeinstallprompt tetiklendi");
   e.preventDefault();
   deferredPrompt = e;
-  installBtn.style.display = "flex"; // görünür hale getir
+  installBtn.style.display = "block";
 });
 
-// Kullanıcı butona tıklarsa
+// Butona tıklanınca yükleme diyaloğunu göster
 installBtn.addEventListener("click", async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt(); // yükleme penceresini aç
-  const choice = await deferredPrompt.userChoice;
-  if (choice.outcome === "accepted") {
-    console.log("✅ Kullanıcı yüklemeyi kabul etti!");
-  } else {
-    console.log("❌ Kullanıcı yüklemeyi reddetti.");
+  if (!deferredPrompt) {
+    console.log("⚠️ Yükleme isteği hazır değil");
+    return;
   }
-  installBtn.style.display = "none";
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  console.log(`✅ Kullanıcı seçimi: ${outcome}`);
   deferredPrompt = null;
+  installBtn.style.display = "none";
+});
+
+// Uygulama yüklendikten sonra logla
+window.addEventListener("appinstalled", () => {
+  console.log("🎉 PWA başarıyla yüklendi!");
+  installBtn.style.display = "none";
 });
 </script>
+
+
 
   
 </body>
 </html>
         
+
 
 
 
