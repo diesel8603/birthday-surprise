@@ -18,7 +18,7 @@
   <link rel="manifest" href="./manifest.json" />
   <meta name="theme-color" content="#0d6efd" />
 
-  <div id="goodbye">Site kapatıldı</div>
+  
   
   <title>6 EYLÜL MUCİZESİ</title>
   <style>
@@ -155,6 +155,131 @@
   </style>
 </head>
 <body>
+  <!-- GOODBYE MESAJI -->
+<div id="goodbye">Site kapatıldı</div>
+
+<style>
+  #goodbye {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 3rem;
+    color: white;
+    opacity: 0;
+    z-index: 9999;
+    text-align: center;
+  }
+  canvas#dustCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9998;
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+
+<script>
+window.addEventListener("load", () => {
+  // Site içeriğini yakala
+  html2canvas(document.body).then(canvas => {
+    const ctx = canvas.getContext('2d');
+    const imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
+    document.body.style.display="none"; // Orijinal siteyi gizle
+    startDustEffect(canvas.width, canvas.height, imgData.data);
+  });
+});
+
+let scene, camera, renderer, particleSystem;
+
+function startDustEffect(width, height, pixels) {
+  // Three.js sahnesi
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+  camera.position.z = 500;
+
+  renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.domElement.id = "dustCanvas";
+  document.body.appendChild(renderer.domElement);
+
+  // Parçacıkları oluştur
+  const blockSize = 4; // piksel blok boyutu
+  const positions = [];
+  const colors = [];
+  const velocities = [];
+
+  for(let y=0; y<height; y+=blockSize){
+    for(let x=0; x<width; x+=blockSize){
+      const idx = (y*width + x)*4;
+      const r = pixels[idx]/255;
+      const g = pixels[idx+1]/255;
+      const b = pixels[idx+2]/255;
+      const a = pixels[idx+3]/255;
+      if(a>0){
+        positions.push(x - width/2, height/2 - y, 0);
+        colors.push(r,g,b);
+        velocities.push({
+          vx: (Math.random()-0.5)*1.5,
+          vy: Math.random()*3 + 1,
+          vz: (Math.random()-0.5)*1.5
+        });
+      }
+    }
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions,3));
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors,3));
+
+  const material = new THREE.PointsMaterial({size:3, vertexColors:true, transparent:true, opacity:1});
+  particleSystem = new THREE.Points(geometry, material);
+  particleSystem.userData.velocities = velocities;
+  scene.add(particleSystem);
+
+  animateParticles();
+}
+
+function animateParticles() {
+  const duration = 10; // saniye
+  const clock = new THREE.Clock();
+  let elapsed = 0;
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const delta = clock.getDelta();
+    elapsed += delta;
+
+    const positions = particleSystem.geometry.attributes.position.array;
+    const velocities = particleSystem.userData.velocities;
+
+    for(let i=0;i<velocities.length;i++){
+      positions[i*3] += velocities[i].vx;
+      positions[i*3+1] += velocities[i].vy;
+      positions[i*3+2] += velocities[i].vz;
+    }
+
+    if(particleSystem.material.opacity > 0){
+      particleSystem.material.opacity -= delta/duration;
+    }
+
+    particleSystem.geometry.attributes.position.needsUpdate = true;
+    renderer.render(scene, camera);
+
+    if(elapsed >= duration){
+      renderer.domElement.remove();
+      document.getElementById("goodbye").style.opacity = 1;
+      return;
+    }
+  }
+
+  animate();
+}
+</script>
+  
 
   <button id="installBtn" style="
   display:none;
@@ -524,77 +649,13 @@ window.addEventListener("appinstalled", () => {
 });
 </script>
 
-<script>
-  window.onload = () => {
-  // Ekranı yakalayıp toza dönüştür
-  html2canvas(document.body).then(canvas => {
-    const ctx = canvas.getContext("2d");
-    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const pixels = imgData.data;
 
-    initThree(canvas.width, canvas.height, pixels);
-    document.body.style.display = "none"; // orijinal siteyi gizle
-    animateParticles();
-  });
-});
-
-
-  particleGeometry = new THREE.BufferGeometry();
-particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions,3));
-particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors,3));
-particleMaterial = new THREE.PointsMaterial({
-  size: 3,
-  vertexColors: true,
-  transparent: true,
-  opacity: 1
-});
-particleSystem = new THREE.Points(particleGeometry, particleMaterial);
-scene.add(particleSystem);
-
-
-  function animateParticles() {
-  const duration = 10; // saniye
-  let elapsed = 0;
-  const clock = new THREE.Clock();
-
-  function animate() {
-    requestAnimationFrame(animate);
-    const delta = clock.getDelta();
-    elapsed += delta;
-
-    const positions = particleSystem.geometry.attributes.position.array;
-    const velocities = particleSystem.userData.velocities;
-
-    for(let i=0;i<velocities.length;i++){
-      positions[i*3] += velocities[i].vx;
-      positions[i*3+1] += velocities[i].vy;
-      positions[i*3+2] += velocities[i].vz;
-    }
-
-    if(particleSystem.material.opacity > 0){
-      particleSystem.material.opacity -= delta/duration;
-    }
-
-    particleSystem.geometry.attributes.position.needsUpdate = true;
-    renderer.render(scene, camera);
-
-    if(elapsed >= duration){
-      document.body.removeChild(renderer.domElement);
-      document.getElementById("goodbye").style.opacity = 1;
-    }
-  }
-
-  animate();
-  }
-
-
-  
-</script>
 
   
 </body>
 </html>
         
+
 
 
 
