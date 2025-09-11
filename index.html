@@ -4,10 +4,21 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
 
+  <!-- Three.js -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<!-- html2canvas -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<!-- GSAP (animasyonlar için) -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+  
+
+
+  
   <!-- Manifest -->
   <link rel="manifest" href="./manifest.json" />
   <meta name="theme-color" content="#0d6efd" />
 
+  <div id="goodbye">Site kapatıldı</div>
   
   <title>6 EYLÜL MUCİZESİ</title>
   <style>
@@ -513,12 +524,78 @@ window.addEventListener("appinstalled", () => {
 });
 </script>
 
+<script>
+  window.onload = () => {
+  // Ekranı yakalayıp toza dönüştür
+  html2canvas(document.body).then(canvas => {
+    const ctx = canvas.getContext("2d");
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imgData.data;
 
+    initThree(canvas.width, canvas.height, pixels);
+    document.body.style.display = "none"; // orijinal siteyi gizle
+    animateParticles();
+  });
+});
+
+
+  particleGeometry = new THREE.BufferGeometry();
+particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions,3));
+particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors,3));
+particleMaterial = new THREE.PointsMaterial({
+  size: 3,
+  vertexColors: true,
+  transparent: true,
+  opacity: 1
+});
+particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+scene.add(particleSystem);
+
+
+  function animateParticles() {
+  const duration = 10; // saniye
+  let elapsed = 0;
+  const clock = new THREE.Clock();
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const delta = clock.getDelta();
+    elapsed += delta;
+
+    const positions = particleSystem.geometry.attributes.position.array;
+    const velocities = particleSystem.userData.velocities;
+
+    for(let i=0;i<velocities.length;i++){
+      positions[i*3] += velocities[i].vx;
+      positions[i*3+1] += velocities[i].vy;
+      positions[i*3+2] += velocities[i].vz;
+    }
+
+    if(particleSystem.material.opacity > 0){
+      particleSystem.material.opacity -= delta/duration;
+    }
+
+    particleSystem.geometry.attributes.position.needsUpdate = true;
+    renderer.render(scene, camera);
+
+    if(elapsed >= duration){
+      document.body.removeChild(renderer.domElement);
+      document.getElementById("goodbye").style.opacity = 1;
+    }
+  }
+
+  animate();
+  }
+
+
+  
+</script>
 
   
 </body>
 </html>
         
+
 
 
 
